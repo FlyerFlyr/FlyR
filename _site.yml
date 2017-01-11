@@ -1,0 +1,16 @@
+## _site.yml
+name: "Fly R"
+output_dir: "."
+navbar:
+  title: "Fly R"
+  left:
+    - text: "Home"
+      href: index.html
+    - text: "FLy R"
+      href: about.html
+
+output:
+  html_document:
+    theme: flatly
+    css: style.css
+    

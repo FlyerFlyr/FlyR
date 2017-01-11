@@ -1,0 +1,52 @@
+---
+title: ""
+---
+<style> div.main-container { max-width: inherit; margin: 0; padding: 0; border-collapse: collapse; } </style>
+
+```{r, echo = F}
+gap <- read.csv('~/flyer/website/FlyR/data/Airports.csv')
+library(leaflet)
+library(magrittr)
+leaflet(width = '100%') %>% addTiles() %>% addPopups(gap$longitude, gap$latitude, paste0("<a href='#", gap$city, "'>", gap$city, "</a>"))
+
+#addPolygons(fillColor = topo.colors(10, alpha = NULL), stroke = FALSE)
+```
+
+<style> div.main-container { max-width: inherit; margin: 100; padding: 2} </style>
+
+```{r plotjes, echo = F, results='asis'}
+load('~/flyer/website/FlyR/data/2017-01-10.RData')
+slct <- rep(gap$iata_faa, each = 2)
+slct[seq(1,425,2)] <- NA
+
+library(dygraphs)
+library(htmltools)
+library(xts)
+res <- lapply(1:426, function(i) {
+  if(is.na(slct[i])) {
+    tags$p(tags$h1(gap$city[gap$iata_faa == slct[i + 1]]),
+           tags$a(`href` = "#", 'Back'))
+  } else {
+    dt <- test[[as.character(slct[i])]]
+    if(dim(dt)[1] > 10){
+      dt <- dt[!is.na(dt$inb.DepartureDate) & !is.na(dt$out.DepartureDate),]
+      ts <- xts(dt$quote, as.Date(dt$out.DepartureDate))
+      dygraph(ts, ylab = 'Price')
+    } else {
+      'not enough data here...'
+    }
+  }
+})
+htmltools::tagList(res)
+```
+
+<script type="text/javascript">
+  // When the document is fully rendered...
+  $(document).ready(function() {
+    // ...select all header elements...
+    $('h1, h2, h3, h4, h5').each(function() {
+      // ...and add an id to them corresponding to their 'titles'
+      $(this).attr('id', $(this).html());
+    });
+  });
+</script>
